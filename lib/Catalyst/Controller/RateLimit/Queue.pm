@@ -4,11 +4,11 @@ use utf8;
 use strict;
 use warnings;
 
-# $Id: Queue.pm 13 2008-10-23 14:19:38Z gugu $
+# $Id: Queue.pm 17 2008-10-30 14:34:47Z gugu $
 # $Source$
 # $HeadURL: file:///var/svn/cps/trunk/lib/Catalyst/Controller/RateLimit/Queue.pm $
 
-our ($VERSION) = '$Revision: 13 $' =~ m{ \$Revision: \s+ (\S+) }mx;
+our ($VERSION) = '$Revision: 17 $' =~ m{ \$Revision: \s+ (\S+) }mx;
 
 use Params::Validate qw/:all/;
 use base 'Class::Accessor::Fast';
@@ -84,7 +84,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::Plugin::StopRobots::Queue
+Catalyst::Controller::RateLimit::Queue
 
 =head1 DESCRIPTION
 

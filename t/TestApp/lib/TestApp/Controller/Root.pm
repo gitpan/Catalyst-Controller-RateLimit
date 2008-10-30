@@ -10,10 +10,15 @@ use parent qw/Catalyst::Controller::RateLimit Catalyst::Controller/;
 #
 __PACKAGE__->config(
     namespace => '',
-    rate_limit => {
-        period =>  3600,
-        max_requests => 5
-    }
+    rate_limit => [
+        {
+            period =>  3600,
+            max_requests => 30
+        }, {
+            period => 60,
+            max_requests => 5
+        }
+    ]
 );
 
 =head1 NAME

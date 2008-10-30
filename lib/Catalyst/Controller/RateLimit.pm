@@ -7,7 +7,7 @@ use Catalyst::Controller::RateLimit::Queue;
 use Carp qw/croak/;
 use 5.008007;
 
-# $Id: RateLimit.pm 14 2008-10-23 14:25:22Z gugu $
+# $Id: RateLimit.pm 17 2008-10-30 14:34:47Z gugu $
 # $Source$
 # $HeadURL: file:///var/svn/cps/trunk/lib/Catalyst/Controller/RateLimit.pm $
 
@@ -21,23 +21,26 @@ See $VERSION
 
 =cut
 
-our ($VERSION) = sprintf "%.02f", ('$Revision: 14 $' =~ m{ \$Revision: \s+ (\S+) }mx)[0]/100;
+our ($VERSION) = sprintf "%.02f", ('$Revision: 17 $' =~ m{ \$Revision: \s+ (\S+) }mx)[0]/100;
 
 =head1 SYNOPSIS
 
 Protects your site from flood, robots and spam.
 
-Checks, if user made more than 30 posts for 30 seconds.
-
     package MyApp::Controller::Post;
     use parent qw/Catalyst::Controller::RateLimit Catalyst::Controller/; 
         # Catalyst::Controller is not required, but i think, it will look better if you include it
     __PACKAGE__->config(
-        rate_limit => {
-            max_requests => 30,
-            period => 30,
-            ban_time => 3600
-        }
+        rate_limit => [
+            {
+                max_requests => 30,
+                period => 3600,
+                ban_time => 3600
+            }, {
+                max_requests => 5,
+                period => 60,
+            }
+        ]
     );
 
     sub login_form : Local { #Only check
@@ -90,25 +93,27 @@ sub is_user_overrated {
     if ( ! $identifier ) {
         croak 'Usage: $self->is_user_overrated( user_identifier )';
     }
-    my $config = $self->{rate_limit};
-    my $cache = $self->_application->cache;
-    my $application_name = ref $self->_application;
-    my $prefix = $application_name . '_rc_' . $identifier;
-    if ( $config->{ban_time} ) {
-        if ($cache->get( "${prefix}_id_$identifier" )){
+    my @configs = @{ $self->{rate_limit} };
+    foreach my $config ( @configs ) {
+        my $cache = $self->_application->cache;
+        my $application_name = ref $self->_application;
+        my $prefix = $application_name . '_rc_' . "$identifier|$config->{period}";
+        if ( $config->{ban_time} ) {
+            if ($cache->get( "${prefix}_id_$identifier" )){
+                return 1;
+            }
+        }
+        my $queue = Catalyst::Controller::RateLimit::Queue->new(
+            cache => $cache,
+            expires => $config->{ period },
+            prefix => $prefix
+        );
+        if ( $queue->size >= $config->{max_requests} ) {
+            if ( $config->{ban_time} ) {
+                $cache->set( "${prefix}::id::$identifier", 1, $config->{ban_time} );
+            }
             return 1;
         }
-    }
-    my $queue = Catalyst::Controller::RateLimit::Queue->new(
-        cache => $cache,
-        expires => $config->{ period },
-        prefix => $prefix
-    );
-    if ( $queue->size >= $config->{max_requests} ) {
-        if ( $config->{ban_time} ) {
-            $cache->set( "${prefix}::id::$identifier", 1, $config->{ban_time} );
-        }
-        return 1;
     }
     return;
 }
@@ -118,17 +123,20 @@ sub register_attempt {
     if ( ! $identifier ) {
         croak 'Usage: $self->register_attempt( user_identifier )';
     }
-    my $config = $self->{rate_limit};
-    my $cache = $self->_application->cache;
-    my $application_name = ref $self->_application;
-    my $is_robot = $self->is_user_overrated( $identifier );
-    my $prefix = $application_name . '_rc_' . $identifier;
-    my $queue = Catalyst::Controller::RateLimit::Queue->new(
-        cache => $cache,
-        expires => $config->{ period },
-        prefix => $prefix
-    );
-    $queue->append( 1 );
+    my $is_robot;
+    my @configs = @{ $self->{rate_limit} };
+    foreach my $config ( @configs ) {
+        my $cache = $self->_application->cache;
+        my $application_name = ref $self->_application;
+        $is_robot = $self->is_user_overrated( $identifier );
+        my $prefix = $application_name . '_rc_' . "$identifier|$config->{period}";
+        my $queue = Catalyst::Controller::RateLimit::Queue->new(
+            cache => $cache,
+            expires => $config->{ period },
+            prefix => $prefix
+        );
+        $queue->append( 1 );
+    }
     if ( $is_robot ) {
         return 1;
     }
