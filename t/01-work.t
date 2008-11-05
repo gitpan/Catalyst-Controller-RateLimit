@@ -18,12 +18,7 @@
 use strict;
 use warnings;
 
-use Test::More ;
-
-if ( ! $ENV{ MEMCACHED_SERVER } ) {
-    plan skip_all => '$ENV{MEMCACHED_SERVER} is not set';
-}
-plan tests => 13;
+use Test::More tests => 13;
 
 use lib 't/TestApp/lib';
 
