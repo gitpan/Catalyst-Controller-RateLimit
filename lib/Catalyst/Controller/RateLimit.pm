@@ -7,7 +7,7 @@ use Algorithm::FloodControl ();
 use Carp qw/croak/;
 use 5.008007;
 
-# $Id: RateLimit.pm 22 2008-11-05 14:08:03Z gugu $
+# $Id: RateLimit.pm 23 2008-11-06 07:54:40Z gugu $
 # $Source$
 # $HeadURL: file:///var/svn/cps/trunk/lib/Catalyst/Controller/RateLimit.pm $
 
@@ -21,7 +21,7 @@ See $VERSION
 
 =cut
 
-our ($VERSION) = sprintf "%.02f", ('$Revision: 22 $' =~ m{ \$Revision: \s+ (\S+) }mx)[0]/100;
+our ($VERSION) = sprintf "%.02f", ('$Revision: 23 $' =~ m{ \$Revision: \s+ (\S+) }mx)[0]/100;
 
 =head1 SYNOPSIS
 
@@ -31,6 +31,8 @@ Protects your site from flood, robots and spam.
     use parent qw/Catalyst::Controller::RateLimit Catalyst::Controller/; 
         # Catalyst::Controller is not required, but i think, it will look better if you include it
     __PACKAGE__->config(
+        rate_limit_backend_name => 'Cache::Memcached::Fast', 
+        # ^- Optional. Only if your module is not Cache::Memcached::Fast child, but has the same behavior.
         rate_limit => {
             default => [
                 {
@@ -84,7 +86,13 @@ Returns Algorithm::FloodControl object.
 sub flood_control {
     my $self = shift;
     if ( ref $self->{rate_limit} eq 'HASH' ) {
-        return new Algorithm::FloodControl( storage => $self->_application->cache, limits => $self->{rate_limit} );
+        return new Algorithm::FloodControl( 
+            $self->{rate_limit_backend_name} ?
+                ( backend_name => $self->{rate_limit_backend_name} ) :
+                (),
+            storage => $self->_application->cache, 
+            limits => $self->{rate_limit} 
+        );
     }
     return;
 }
