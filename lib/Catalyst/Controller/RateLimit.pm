@@ -1,8 +1,7 @@
 package Catalyst::Controller::RateLimit;
 use strict;
 use warnings;
-use base 'Catalyst::Controller';
-use Params::Validate qw/:all/;
+use parent 'Catalyst::Controller';
 use Algorithm::FloodControl ();
 use Carp qw/croak/;
 use 5.008007;
@@ -21,7 +20,7 @@ See $VERSION
 
 =cut
 
-our ($VERSION) = sprintf "%.02f", ('$Revision: 23 $' =~ m{ \$Revision: \s+ (\S+) }mx)[0]/100;
+our ($VERSION) = sprintf "%.02f", ('$Revision: 24 $' =~ m{ \$Revision: \s+ (\S+) }mx)[0]/100;
 
 =head1 SYNOPSIS
 
@@ -105,7 +104,7 @@ Andrey Kostenko, C<< <andrey at kostenko.name> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-catalyst-plugin-stoprobots at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-StopRobots>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Controller-RateLimit>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
