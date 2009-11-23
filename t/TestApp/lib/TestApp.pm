@@ -17,7 +17,7 @@ use parent qw/Catalyst/;
 use Catalyst qw/
                 ConfigLoader
                 Cache::FastMmap
-                Static::Simple/;
+                /;
 our $VERSION = '0.01';
 
 # Configure the application. 

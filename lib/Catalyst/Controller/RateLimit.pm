@@ -20,7 +20,7 @@ See $VERSION
 
 =cut
 
-our ($VERSION) = sprintf "%.02f", ('$Revision: 24 $' =~ m{ \$Revision: \s+ (\S+) }mx)[0]/100;
+our $VERSION = 0.25;
 
 =head1 SYNOPSIS
 
