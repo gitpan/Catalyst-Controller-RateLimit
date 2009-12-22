@@ -14,5 +14,7 @@ requires 'parent';
 requires 'Algorithm::FloodControl' => 1.91;
 
 test_requires 'Catalyst::Plugin::Cache::FastMmap';
+test_requires 'Catalyst::Plugin::ConfigLoader';
+repository 'http://developers.rambler.ru/svn/perlmodules/Catalyst-Controller-RateLimit';
 
 WriteAll();
