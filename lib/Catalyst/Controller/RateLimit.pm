@@ -20,7 +20,7 @@ See $VERSION
 
 =cut
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 =head1 SYNOPSIS
 
